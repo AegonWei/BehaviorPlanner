@@ -6,6 +6,7 @@
 #include <string>
 #include <iterator>
 #include "cost.h"
+#include <limits>
 
 /**
  * Initializes Vehicle
@@ -50,9 +51,24 @@ vector<Vehicle> Vehicle::choose_next_state(map<int, vector<Vehicle>> predictions
     */
 
     //TODO: Your solution here.
-
+    vector<string> possible_successor_states = successor_states();
+    vector< vector<Vehicle> > final_trajectories;
+    vector<float> costs;
+    float cost;
+    for (auto state: possible_successor_states) {
+      vector<Vehicle> trajectory = generate_trajectory(state, predictions);
+      if (trajectory.size() != 0) {
+        cost = calculate_cost(*this, predictions, trajectory);
+        costs.push_back(cost);
+        final_trajectories.push_back(trajectory);
+      }
+      else
+        costs.push_back(numeric_limits<float>::max());
+    }
     //TODO: Change return value here:
-    return generate_trajectory("KL", predictions);
+    vector<float>::iterator min_cost = min_element(begin(costs), end(costs));
+    int min_idx = distance(begin(costs), min_cost);
+    return final_trajectories[min_idx];
 }
 
 vector<string> Vehicle::successor_states() {
